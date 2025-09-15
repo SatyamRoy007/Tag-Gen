@@ -1,0 +1,742 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Tag Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fef2f2 0%, #fce7f3 100%);
+            color: #1f2937;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        body.dark {
+            background: #111827;
+            color: #f9fafb;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            background: #dc2626;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            color: white;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        body.dark .subtitle {
+            color: #9ca3af;
+        }
+
+        .theme-toggle {
+            background: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: all 0.2s;
+        }
+
+        body.dark .theme-toggle {
+            background: #374151;
+            color: #f9fafb;
+        }
+
+        .theme-toggle:hover {
+            background: #f9fafb;
+        }
+
+        body.dark .theme-toggle:hover {
+            background: #4b5563;
+        }
+
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            margin-bottom: 2rem;
+        }
+
+        body.dark .card {
+            background: #1f2937;
+        }
+
+        .input-section {
+            margin-bottom: 1rem;
+        }
+
+        .input-label {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        body.dark .input-field {
+            background: #374151;
+            border-color: #4b5563;
+            color: #f9fafb;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        .generate-btn {
+            padding: 1rem 2rem;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            background: #b91c1c;
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid white;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            background: #10b981;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .tags-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .tags-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            color: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-blue { background: #2563eb; }
+        .btn-blue:hover { background: #1d4ed8; }
+        .btn-green { background: #059669; }
+        .btn-green:hover { background: #047857; }
+        .btn-purple { background: #7c3aed; }
+        .btn-purple:hover { background: #6d28d9; }
+
+        .tags-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .tag-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        body.dark .tag-card {
+            background: #374151;
+            border-color: #4b5563;
+        }
+
+        .tag-card:hover {
+            border-color: #dc2626;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .tag-text {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        body.dark .tag-meta {
+            color: #9ca3af;
+        }
+
+        .competition-badge {
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .competition-low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .competition-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .competition-high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .description-area {
+            width: 100%;
+            height: 16rem;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            resize: none;
+            font-family: inherit;
+        }
+
+        body.dark .description-area {
+            background: #374151;
+            border-color: #4b5563;
+            color: #f9fafb;
+        }
+
+        .example-section {
+            margin-top: 2rem;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .step-number {
+            background: #fee2e2;
+            color: #dc2626;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .step-content p {
+            color: #6b7280;
+        }
+
+        body.dark .step-content p {
+            color: #9ca3af;
+        }
+
+        .pro-tip {
+            background: #eff6ff;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        body.dark .pro-tip {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .pro-tip h4 {
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+
+        body.dark .pro-tip h4 {
+            color: #93c5fd;
+        }
+
+        .pro-tip p {
+            color: #1e40af;
+            font-size: 0.875rem;
+        }
+
+        body.dark .pro-tip p {
+            color: #bfdbfe;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tags-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
+
+            .tags-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <i data-lucide="play" style="width: 2rem; height: 2rem; fill: white;"></i>
+                </div>
+                <div>
+                    <h1 class="title">YouTube Tag Generator</h1>
+                    <p class="subtitle">Generate SEO-optimized tags for your YouTube videos</p>
+                </div>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i data-lucide="moon" id="theme-icon" style="width: 1.25rem; height: 1.25rem;"></i>
+            </button>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-message" class="success-message hidden"></div>
+
+        <!-- Input Section -->
+        <div class="card">
+            <div class="input-section">
+                <label class="input-label">Enter Your YouTube Video Title</label>
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="title-input" 
+                        class="input-field"
+                        placeholder="e.g., How to Make Chocolate Cake at Home | Easy Recipe"
+                    >
+                    <button class="generate-btn" onclick="generateTags()" id="generate-btn">
+                        <i data-lucide="hash" style="width: 1.25rem; height: 1.25rem;"></i>
+                        Generate Tags
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tags Output -->
+        <div id="tags-section" class="card hidden">
+            <div class="tags-header">
+                <h2 class="tags-title">
+                    <i data-lucide="trending-up" style="width: 1.25rem; height: 1.25rem; color: #dc2626;"></i>
+                    Generated Tags (<span id="tag-count">0</span>)
+                </h2>
+                <div class="action-buttons">
+                    <button class="btn btn-blue" onclick="copyAllTags()">
+                        <i data-lucide="copy" style="width: 1rem; height: 1rem;"></i>
+                        Copy All
+                    </button>
+                    <button class="btn btn-green" onclick="exportTags('txt')">
+                        <i data-lucide="download" style="width: 1rem; height: 1rem;"></i>
+                        TXT
+                    </button>
+                    <button class="btn btn-purple" onclick="exportTags('csv')">
+                        <i data-lucide="download" style="width: 1rem; height: 1rem;"></i>
+                        CSV
+                    </button>
+                </div>
+            </div>
+            <div id="tags-grid" class="tags-grid"></div>
+        </div>
+
+        <!-- Description Section -->
+        <div id="description-section" class="card hidden">
+            <div class="tags-header">
+                <h2 class="tags-title">Suggested Video Description</h2>
+                <button class="btn btn-blue" onclick="copyDescription()">
+                    <i data-lucide="copy" style="width: 1rem; height: 1rem;"></i>
+                    Copy Description
+                </button>
+            </div>
+            <textarea id="description-area" class="description-area" readonly></textarea>
+        </div>
+
+        <!-- Example Section -->
+        <div id="example-section" class="card">
+            <h2 class="tags-title">How it works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Enter your video title</h3>
+                        <p>Type in your YouTube video title in the input field above</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Generate SEO tags</h3>
+                        <p>Our AI analyzes your title and generates relevant, SEO-optimized tags with search volumes</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Copy and export</h3>
+                        <p>Copy tags to your clipboard or export them as CSV/TXT files for later use</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pro-tip">
+                <h4>💡 Pro Tip:</h4>
+                <p>Try "How to Make Chocolate Cake at Home | Easy Recipe" as an example to see the magic happen!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTags = [];
+        let isDarkMode = false;
+
+        // Common YouTube keywords and categories
+        const commonKeywords = {
+            tutorial: ['tutorial', 'how to', 'guide', 'step by step', 'learn', 'beginners', 'tips', 'tricks'],
+            cooking: ['recipe', 'cooking', 'baking', 'food', 'kitchen', 'homemade', 'easy', 'delicious'],
+            tech: ['review', 'unboxing', 'tech', 'gadget', 'smartphone', 'laptop', 'technology', 'comparison'],
+            gaming: ['gaming', 'gameplay', 'walkthrough', 'review', 'tips', 'strategy', 'best', 'guide'],
+            lifestyle: ['lifestyle', 'vlog', 'daily', 'routine', 'tips', 'advice', 'personal', 'experience'],
+            fitness: ['workout', 'fitness', 'exercise', 'health', 'training', 'gym', 'muscle', 'weight loss'],
+            music: ['music', 'song', 'cover', 'remix', 'acoustic', 'live', 'performance', 'artist'],
+            business: ['business', 'entrepreneur', 'marketing', 'success', 'money', 'investment', 'strategy']
+        };
+
+        const stopWords = ['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those'];
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Add Enter key support
+        document.getElementById('title-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateTags();
+            }
+        });
+
+        function extractKeywords(text) {
+            const words = text.toLowerCase()
+                .replace(/[^\w\s]/g, ' ')
+                .split(/\s+/)
+                .filter(word => word.length > 2 && !stopWords.includes(word));
+            
+            return [...new Set(words)];
+        }
+
+        function generateTags() {
+            const titleInput = document.getElementById('title-input');
+            const title = titleInput.value.trim();
+            
+            if (!title) return;
+            
+            const generateBtn = document.getElementById('generate-btn');
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<div class="spinner"></div> Generating...';
+
+            // Simulate API delay
+            setTimeout(() => {
+                const keywords = extractKeywords(title);
+                const generatedTags = new Set();
+
+                // Add original keywords
+                keywords.forEach(keyword => {
+                    generatedTags.add(keyword);
+                });
+
+                // Generate long-tail keywords
+                for (let i = 0; i < keywords.length - 1; i++) {
+                    for (let j = i + 1; j < Math.min(keywords.length, i + 3); j++) {
+                        generatedTags.add(`${keywords[i]} ${keywords[j]}`);
+                    }
+                }
+
+                // Add contextual keywords
+                Object.entries(commonKeywords).forEach(([category, categoryKeywords]) => {
+                    const titleLower = title.toLowerCase();
+                    if (categoryKeywords.some(kw => titleLower.includes(kw))) {
+                        categoryKeywords.slice(0, 3).forEach(kw => {
+                            if (!titleLower.includes(kw)) {
+                                generatedTags.add(kw);
+                            }
+                        });
+                    }
+                });
+
+                // Generate phrase combinations
+                if (keywords.length >= 2) {
+                    generatedTags.add(`${keywords[0]} ${keywords[1]} guide`);
+                    generatedTags.add(`best ${keywords[0]} tips`);
+                    generatedTags.add(`${keywords[0]} for beginners`);
+                    generatedTags.add(`how to ${keywords.slice(0, 2).join(' ')}`);
+                }
+
+                // Convert to array and add metadata
+                currentTags = Array.from(generatedTags)
+                    .slice(0, 20)
+                    .map(tag => ({
+                        text: tag,
+                        volume: Math.floor(Math.random() * 50000) + 1000,
+                        competition: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)]
+                    }))
+                    .sort((a, b) => b.volume - a.volume);
+
+                displayTags();
+                generateDescription();
+                
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i data-lucide="hash" style="width: 1.25rem; height: 1.25rem;"></i> Generate Tags';
+                lucide.createIcons();
+                
+                // Hide example section
+                document.getElementById('example-section').classList.add('hidden');
+            }, 1000);
+        }
+
+        function displayTags() {
+            const tagsSection = document.getElementById('tags-section');
+            const tagsGrid = document.getElementById('tags-grid');
+            const tagCount = document.getElementById('tag-count');
+            
+            tagsSection.classList.remove('hidden');
+            tagCount.textContent = currentTags.length;
+            
+            tagsGrid.innerHTML = currentTags.map((tag, index) => `
+                <div class="tag-card" onclick="copyTag('${tag.text}')">
+                    <div class="tag-text">#${tag.text}</div>
+                    <div class="tag-meta">
+                        <span>${tag.volume.toLocaleString()} searches</span>
+                        <span class="competition-badge competition-${tag.competition.toLowerCase()}">
+                            ${tag.competition}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateDescription() {
+            const topTags = currentTags.slice(0, 8).map(tag => tag.text);
+            const description = `Welcome to our channel! In this video, we'll cover everything you need to know about ${topTags[0] || 'this topic'}.
+
+Key topics covered:
+${topTags.slice(0, 5).map(tag => `• ${tag.charAt(0).toUpperCase() + tag.slice(1)}`).join('\n')}
+
+Don't forget to like, subscribe, and hit the notification bell for more content!
+
+Tags: ${topTags.join(', ')}
+
+#${topTags.slice(0, 3).join(' #').replace(/\s/g, '')}`;
+
+            document.getElementById('description-area').value = description;
+            document.getElementById('description-section').classList.remove('hidden');
+        }
+
+        async function copyToClipboard(text, type) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showSuccess(`${type} copied!`);
+            } catch (err) {
+                showSuccess('Failed to copy');
+            }
+        }
+
+        function copyTag(tagText) {
+            copyToClipboard(tagText, 'Tag');
+        }
+
+        function copyAllTags() {
+            const tagTexts = currentTags.map(tag => tag.text).join(', ');
+            copyToClipboard(tagTexts, 'Tags');
+        }
+
+        function copyDescription() {
+            const description = document.getElementById('description-area').value;
+            copyToClipboard(description, 'Description');
+        }
+
+        function exportTags(format) {
+            const tagTexts = currentTags.map(tag => tag.text);
+            let content = '';
+            let filename = '';
+            
+            if (format === 'csv') {
+                content = 'Tag,Search Volume,Competition\n' + 
+                         currentTags.map(tag => `"${tag.text}",${tag.volume},${tag.competition}`).join('\n');
+                filename = 'youtube_tags.csv';
+            } else {
+                content = tagTexts.join('\n');
+                filename = 'youtube_tags.txt';
+            }
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.classList.remove('hidden');
+            setTimeout(() => {
+                successDiv.classList.add('hidden');
+            }, 2000);
+        }
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (isDarkMode) {
+                body.classList.add('dark');
+                themeIcon.setAttribute('data-lucide', 'sun');
+            } else {
+                body.classList.remove('dark');
+                themeIcon.setAttribute('data-lucide', 'moon');
+            }
+            
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
